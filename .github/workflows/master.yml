@@ -5,7 +5,7 @@ on:
     branches: [master] # Ensures the workflow triggers on pushes to master
 
   schedule:
-    - cron: '0 */12 * * *' # Executes every 12 hours
+    - cron: '0 */8 * * *' # Executes every 8 hours
 
   workflow_dispatch: # Allows manual triggering from the GitHub UI
 
@@ -28,8 +28,9 @@ jobs:
 
       - name: Update Timestamp File
         run: |
+          export TZ="Asia/Jakarta" # Set timezone to UTC+7 (Jakarta time)
           current_time=$(date '+%Y-%m-%d %H:%M:%S')
-          echo "Updated on $current_time" > TIMESTAMP.txt
+          echo "Updated on $current_time (UTC+7)" > TIMESTAMP.txt
 
       - name: Setup Git Configuration
         run: |
@@ -38,11 +39,12 @@ jobs:
 
       - name: Prepare Commit
         run: |
-          commit_messages=("Update: ⏰" "Refresh: 🔄" "Renew: 🌟" "Revise: 📝" "Amend: 🛠" "Adjust: 🔧" "Change: 📈" "Modify: 🖊" "Transform: 🌀" "Revamp: 🌈")
-          random_msg=${commit_messages[$RANDOM % ${#commit_messages[@]}]}
+          export TZ="Asia/Jakarta" # Set timezone to UTC+7 (Jakarta time)
+          current_time=$(date '+%Y-%m-%d %H:%M:%S')
+          commit_message="Update at $current_time (UTC+7)"
 
           git add TIMESTAMP.txt
-          git commit -m "$random_msg - $current_time" || echo "No changes to commit."
+          git commit -m "$commit_message" || echo "No changes to commit."
 
       - name: GitHub Push
         uses: ad-m/github-push-action@v0.6.0
